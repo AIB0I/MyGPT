@@ -1,0 +1,8 @@
+__pycache__
+mygpt/__pycache__
+.ai
+testing
+logs
+tests
+setup.py
+chat_history.db
