@@ -1,6 +1,6 @@
 # MyGPT
 
-MyGPT aims to be a personal assistant designed to learn from user interactions, building a personalized knowledge graph to enhance future conversations. It also generates valuable data for fine-tuning the language models for pesonalization.
+MyGPT aims to be a personal assistant designed to learn from user interactions, building a personalized knowledge graph to enhance future conversations. It also generates valuable data for fine-tuning language models for personalization.
 
 ## Main Concepts
 
@@ -9,60 +9,118 @@ MyGPT aims to be a personal assistant designed to learn from user interactions, 
 - **Personalized Communication**: MyGPT learns the user's preferred tone, structure, and style for specific contexts or types of content.
 - **Relationship Dynamics**: Through continued use, the chatbot learns about the user's dynamics with other individuals or entities mentioned in conversations.
 
-## Features
+## Roadmap for v0.1
 
-- [x] Start new chat sessions
-- [x] Continue existing chat sessions
-- [x] Chat history persistence
-- [x] Support for Ollama (with plans to support other LLM providers in the future)
-- [x] Configurable Ollama model
-- [x] SQLite for chat data storage (with plans to support more robust databases in the future)
+For v0.1, we are focusing on establishing core functionality:
+
+- [x] FastAPI backend for handling multiple sessions
+- [x] SQLite for interaction data storage
+- [x] LiteLLM integration for flexible LLM provider support
+- [x] LLM backend to work with Ollama
+- [ ] Basic user interface for performing and managing multiple interaction sessions
 - [ ] Knowledge graph construction from user interactions
-- [ ] Knowledge graph retrival
-- [ ] Automatic feedback collection from user interactions
-- [ ] UI
+- [ ] Personalization using the knowledge graph
 
-**Note:** This project is under active development. While it aims to provide advanced personalization and learning capabilities, some features may still be in progress or experimental.
+**Note:** This project is under active development. v0.1 aims to provide a functional foundation with basic implementations of key features. Advanced optimizations and more sophisticated implementations of the main concepts will be addressed in future versions.
 
 ## Installation and Usage
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/mygpt.git
-   cd mygpt
-   ```
-
-2. Install the required packages:
+1. Install the required packages:
    ```
    pip install -r requirements.txt
    ```
 
-3. Set up your environment variables:
-   Create a `.env` file in the `mygpt` directory with the following content:
+2. Set up your environment variables:
+   Create a `.env` file in the `backend` directory with the following content:
    ```
-   CHAT_DB=chat_history.db
-   OLLAMA_MODEL=llama3.2:3b-instruct-q4_K_M
+   APP_DB=app.db
+   OLLAMA_MODEL=ollama/llama3.2:3b-instruct-q4_K_M
+   OLLAMA_API_BASE=http://localhost:11434
    ```
-   Adjust the `OLLAMA_MODEL` value if you want to use a different model.
+   Adjust the `OLLAMA_MODEL` and `OLLAMA_API_BASE` values if needed.
 
-4. Run the main script:
+3. Run the backend server:
    ```
-   python mygpt/main.py
+   cd backend
+   python -m mygpt.main
    ```
 
-   Follow the prompts to start a new chat or continue an existing one. As you interact with MyGPT, it will continuously learn and adapt to your communication style and needs.
+   The FastAPI server will start, and you can interact with it using API calls.
 
 ## Project Structure
 
-- `mygpt/main.py`: Main entry point of the application
-- `mygpt/chatbot.py`: Chatbot class implementation
-- `mygpt/db.py`: Database operations for chat history
-- `mygpt/utils.py`: Utility functions (e.g., logging setup)
+- `backend/mygpt/main.py`: Main entry point of the application
+- `backend/mygpt/api.py`: FastAPI routes and API logic
+- `backend/mygpt/db.py`: Database operations for chat history
+- `backend/mygpt/session.py`: Session management for chat interactions
+- `backend/mygpt/utils.py`: Utility functions (e.g., logging setup)
 - `requirements.txt`: List of Python package dependencies
+
+## API Endpoints and Usage Examples
+
+### Start a new chat session or continue an existing one
+
+Endpoint: `POST /session`
+
+Usage:
+
+#### Start a new session
+```bash
+curl -X POST http://localhost:8000/session \
+   -H "Content-Type: application/json" \
+   -d '{ "message": "Hello, I would like to start a chat."}'
+``` 
+
+The response will include the AI's reply and the newly created session ID:
+```json
+{
+  "response": "Hello! I'm doing well, thank you for asking. How can I assist you today?",
+  "session_id": "newly_created_session_id"
+}
+```
+
+#### Continue an existing session
+```bash
+curl -X POST http://localhost:8000/session \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What was our last conversation about?", "session_id": "previously_returned_session_id"}'
+```
+
+The response will include the AI's reply and the same session ID:
+```json
+{
+  "response": "Hello! I'm doing well, thank you for asking. How can I assist you today?",
+  "session_id": "same_session_id"
+}
+```
+
+### Retrieve the message history for a specific session
+
+Endpoint: `GET /session/{session_id}/history`
+
+Usage:
+
+```bash
+curl http://localhost:8000/session/your_session_id_here/history
+```
+
+The response will include the full conversation history for the specified session:
+
+```json
+{
+  "session_id": "your_session_id_here",
+  "history": [
+      ["user","Hello, I would like to start a chat."],
+      ["assistant","I'd be happy to have a conversation with you. How's your day going so far?"],
+      ["user","It's going well, thank you! I'm just exploring this new chatbot technology."],
+      ["assistant","That's great! It's always exciting to see new advancements in AI. How can I assist you today?"]
+  ]
+}
+```
 
 ## Logging
 
-Logs are stored in the `logs` directory, with each session creating a new log file.
+Logs are stored in the `backend/logs` directory, with each session creating a new log file.
 
 ## Contributing
 

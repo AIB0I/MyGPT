@@ -1,8 +1,7 @@
 __pycache__
-mygpt/__pycache__
+.pytest_cache
 .ai
-testing
-logs
-tests
-setup.py
-chat_history.db
+dump
+backend/logs
+backend/app.db
+backend/tests
